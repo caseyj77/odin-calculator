@@ -57,3 +57,14 @@ percentageButton.addEventListener("click", function() {
     display.textContent = currentValue;
 });
 
+//postivie/negative button. reverese the sign on the display number
+const posnegButton = document.getElementById("+/-");
+
+posnegButton.addEventListener("click", function(){
+    const display = document.getElementById("display");
+    let currentValue = parseFloat(display.textContent);
+        currentValue *= -1;
+        display.textContent = currentValue;
+
+});
+
