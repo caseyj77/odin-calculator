@@ -1,116 +1,112 @@
-// Array to store operands and operators
-let expressionArray = [];
+document.addEventListener('DOMContentLoaded', () => {
+    const display = document.getElementById('display');  // Get the display element
 
-// Function to update the display with the current expression
-function updateDisplay() {
-  const display = document.getElementById("display");
-  display.textContent = expressionArray.join('');
-}
+    // Select all number buttons and operand buttons
+    const numButtons = document.querySelectorAll('.button > button');
+    const operatorButtons = document.querySelectorAll('.button.operand > button');
 
-// Function to perform calculation
-function performCalculation() {
-  if (expressionArray.length < 3) {
-    // Not enough operands, do nothing
-    return;
-  }
-  const operand1 = parseFloat(expressionArray[0]);
-  const operator = expressionArray[1];
-  const operand2 = parseFloat(expressionArray[2]);
-  let result;
+    // Initialize calculator state
+    let currentInput = '0';
+    let previousInput = '';
+    let operation = null;
+    let resetScreen = false;
 
-  switch (operator) {
-    case "+":
-      result = operand1 + operand2;
-      break;
-    case "-":
-      result = operand1 - operand2;
-      break;
-    case "*":
-      result = operand1 * operand2;
-      break;
-    case "/":
-      if (operand2 === 0) {
-        // Handle division by zero error
-        alert("Error: Cannot divide by zero");
-        return;
-      }
-      result = operand1 / operand2;
-      break;
-    default:
-      // Handle invalid operator
-      alert("Error: Invalid operator");
-      return;
-  }
+    // Update display with current input
+    const updateDisplay = () => {
+        display.textContent = currentInput;
+    };
 
-  // Update the display and expression array
-  const display = document.getElementById("display");
-  display.textContent = result;
-  expressionArray = [result.toString()];
-}
+    // Handle number button click
+    const handleNumber = (number) => {
+        if (resetScreen || currentInput === '0') {
+            currentInput = number;
+            resetScreen = false;
+        } else {
+            currentInput += number;
+        }
+        updateDisplay();
+    };
 
-// Select all buttons
-const buttons = document.querySelectorAll(".button");
+    // Handle operator button click
+    const handleOperator = (op) => {
+        if (operation !== null) calculate();
+        previousInput = currentInput;
+        operation = op;
+        resetScreen = true;
+    };
 
-// Iterate over each button and attach a click event listener
-buttons.forEach(button => {
-  button.addEventListener("click", function(event) {
-    const buttonText = button.textContent;
+    // Perform calculation
+    const calculate = () => {
+        let calcResult;
+        const prev = parseFloat(previousInput);
+        const current = parseFloat(currentInput);
+        if (isNaN(prev) || isNaN(current)) return;
+        switch (operation) {
+            case '+':
+                calcResult = prev + current;
+                break;
+            case '-':
+                calcResult = prev - current;
+                break;
+            case '*':
+                calcResult = prev * current;
+                break;
+            case '/':
+                if (current === 0) {
+                    display.textContent = "Error";
+                    return;
+                }
+                calcResult = prev / current;
+                break;
+            default:
+                return;
+        }
+        currentInput = calcResult.toString();
+        operation = null;
+        updateDisplay();
+    };
 
-    // Check if the clicked button is a number, decimal point, or operator
-    if (!isNaN(parseFloat(buttonText)) || buttonText === '.') {
-      // Update the display
-      const display = document.getElementById("display");
-      display.textContent += buttonText;
-    } else {
-      // Operator button pressed, perform calculation
-      performCalculation();
-      // Push the operator to the expression array
-      expressionArray.push(buttonText);
-    }
-    updateDisplay(); // Update the display after each input
-  });
-});
+    // Add event listeners to number buttons
+    numButtons.forEach(button => {
+        button.addEventListener('click', () => handleNumber(button.textContent));
+    });
 
-// AC Button to clear the display and reset the expression array
-const acButton = document.getElementById("AC");
+    // Add event listeners to operator buttons
+    operatorButtons.forEach(button => {
+        button.addEventListener('click', () => handleOperator(button.textContent));
+    });
 
-acButton.addEventListener("click", function(event) {
-  const display = document.getElementById("display");
-  display.textContent = "";
-  expressionArray = []; // Reset the expression array
-});
+    // Clear all inputs
+    document.getElementById('AC').querySelector('button').addEventListener('click', () => {
+        currentInput = '0';
+        previousInput = '';
+        operation = null;
+        resetScreen = true;
+        updateDisplay();
+    });
 
-// Step 1: Select the Percentage Button
-const percentageButton = document.getElementById("%");
+    // Calculate result when equals is clicked
+    document.getElementById('=').querySelector('button').addEventListener('click', calculate);
 
-// Step 2: Attach an Event Listener
-percentageButton.addEventListener("click", function() {
-  // Step 3: Define the Event Handler Function
-  // Step 4: Get the Current Display Value
-  const display = document.getElementById("display");
-  let currentValue = parseFloat(display.textContent); // Convert the display value to a number
+    // Toggle sign of the current input
+    document.getElementById('+/-').querySelector('button').addEventListener('click', () => {
+        currentInput = (parseFloat(currentInput) * -1).toString();
+        updateDisplay();
+    });
 
-  // Step 5: Calculate the Percentage
-  currentValue /= 100;
+    // Convert current input to a percentage
+    document.getElementById('%').querySelector('button').addEventListener('click', () => {
+        currentInput = (parseFloat(currentInput) / 100).toString();
+        updateDisplay();
+    });
 
-  // Step 6: Update the Display
-  display.textContent = currentValue;
+    // Append decimal point to current input
+    document.getElementById('.').querySelector('button').addEventListener('click', () => {
+        if (!currentInput.includes('.')) {
+            currentInput += '.';
+            updateDisplay();
+        }
+    });
 
-  // Push the result onto the expression array
-  expressionArray = [currentValue.toString()];
-});
-
-// Positive/Negative button. Reverse the sign on the display number
-const posnegButton = document.getElementById("+/-");
-
-posnegButton.addEventListener("click", function(){
-  const display = document.getElementById("display");
-  let currentValue = parseFloat(display.textContent);
-  currentValue *= -1;
-
-  // Update the display
-  display.textContent = currentValue;
-
-  // Push the result onto the expression array
-  expressionArray = [currentValue.toString()];
+    updateDisplay(); // Initial display update
 });
