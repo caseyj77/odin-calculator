@@ -9,6 +9,10 @@ function updateDisplay() {
 
 // Function to perform calculation
 function performCalculation() {
+  if (expressionArray.length < 3) {
+    // Not enough operands, do nothing
+    return;
+  }
   const operand1 = parseFloat(expressionArray[0]);
   const operator = expressionArray[1];
   const operand2 = parseFloat(expressionArray[2]);
@@ -50,7 +54,6 @@ const buttons = document.querySelectorAll(".button");
 // Iterate over each button and attach a click event listener
 buttons.forEach(button => {
   button.addEventListener("click", function(event) {
-    // Get the text content of the clicked button
     const buttonText = button.textContent;
 
     // Check if the clicked button is a number, decimal point, or operator
@@ -58,15 +61,13 @@ buttons.forEach(button => {
       // Update the display
       const display = document.getElementById("display");
       display.textContent += buttonText;
-    } else if (expressionArray.length >= 2 && !isNaN(parseFloat(expressionArray[expressionArray.length - 1]))) {
-      // If an operator is pressed after the second operand, perform calculation
-      performCalculation();
-      // Push the result onto the expression array
-      expressionArray.push(buttonText);
     } else {
-      // Push the operand/operator to the expression array
+      // Operator button pressed, perform calculation
+      performCalculation();
+      // Push the operator to the expression array
       expressionArray.push(buttonText);
     }
+    updateDisplay(); // Update the display after each input
   });
 });
 
