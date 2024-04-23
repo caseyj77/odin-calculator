@@ -1,63 +1,94 @@
-//add content below
-// Select all buttons and define display
-const buttons = document.querySelectorAll(".button");
-const display = document.getElementById("display");
+// Array to store operands and operators
+let expressionArray = [];
 
-// Event listeners for all buttons
+// Function to update the display with the current expression
+function updateDisplay() {
+    const display = document.getElementById("display");
+    display.textContent = expressionArray.join('');
+}
+
+// Function to perform calculation
+function performCalculation() {
+    const result = evaluateExpression(expressionArray);
+    const display = document.getElementById("display");
+    display.textContent = result;
+    expressionArray = [result]; // Update the expression array with the result
+}
+
+// Function to evaluate the expression array and return the result
+function evaluateExpression(expressionArray) {
+    // Convert the array elements to a string
+    const expressionString = expressionArray.join("");
+    // Use eval() to evaluate the expression (This is just an example, consider safer alternatives)
+    return eval(expressionString);
+}
+
+// Select all buttons
+const buttons = document.querySelectorAll(".button");
+
+// Iterate over each button and attach a click event listener
 buttons.forEach(button => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", function(event) {
+        // Get the text content of the clicked button
         const buttonText = button.textContent;
-        if (isNaN(parseFloat(buttonText)) && buttonText !== "=") {
-            performCalculation(buttonText);
+
+        // Check if the clicked button is a number, decimal point, or operator
+        if (!isNaN(parseFloat(buttonText)) || buttonText === '.') {
+            // Update the display
+            const display = document.getElementById("display");
+            display.textContent += buttonText;
+        } else if (expressionArray.length >= 2 && !isNaN(parseFloat(expressionArray[expressionArray.length - 1]))) {
+            // If an operator is pressed after the second operand, perform calculation
+            performCalculation();
+            // Push the result onto the expression array
+            expressionArray.push(buttonText);
         } else {
-            display.textContent += buttonText; // Append number or "="
+            // Push the operand/operator to the expression array
+            expressionArray.push(buttonText);
         }
     });
 });
 
-// Clear display and reset calculation on AC button press
-document.getElementById("AC").addEventListener("click", () => {
+// AC Button to clear the display and reset the expression array
+const acButton = document.getElementById("AC");
+
+acButton.addEventListener("click", function(event) {
+    const display = document.getElementById("display");
     display.textContent = "";
-    calculationArray = [];
+    expressionArray = []; // Reset the expression array
 });
 
-// Define calculation logic
-let calculationArray = [];
+// Step 1: Select the Percentage Button
+const percentageButton = document.getElementById("%");
 
-function performCalculation(operand) {
-    const currentNumber = parseFloat(display.textContent);
-    calculationArray.push(currentNumber);
-    calculationArray.push(operand);
+// Step 2: Attach an Event Listener
+percentageButton.addEventListener("click", function() {
+    // Step 3: Define the Event Handler Function
+    // Step 4: Get the Current Display Value
+    const display = document.getElementById("display");
+    let currentValue = parseFloat(display.textContent); // Convert the display value to a number
 
-    if (calculationArray.length >= 3) {
-        const result = calculateResult();
-        display.textContent = result;
-        calculationArray = [result];
-    } else {
-        display.textContent = ""; // Ready for next number
-    }
-}
+    // Step 5: Calculate the Percentage
+    currentValue /= 100;
 
-// Calculate result based on stored numbers and operand
-function calculateResult() {
-    const [num1, operand, num2] = calculationArray;
-    switch (operand) {
-        case '+': return num1 + num2;
-        case '-': return num1 - num2;
-        case '*': return num1 * num2;
-        case '/': return num1 / num2;
-        default: return "Error"; // Handle unknown operand
-    }
-}
-
-// Convert current display value to percentage
-document.getElementById("%").addEventListener("click", () => {
-    let currentValue = parseFloat(display.textContent) / 100;
+    // Step 6: Update the Display
     display.textContent = currentValue;
+
+    // Push the result onto the expression array
+    expressionArray = [currentValue.toString()];
 });
 
-// Toggle positive/negative
-document.getElementById("+/-").addEventListener("click", () => {
-    let currentValue = -parseFloat(display.textContent);
+// Positive/Negative button. Reverse the sign on the display number
+const posnegButton = document.getElementById("+/-");
+
+posnegButton.addEventListener("click", function(){
+    const display = document.getElementById("display");
+    let currentValue = parseFloat(display.textContent);
+    currentValue *= -1;
+
+    // Update the display
     display.textContent = currentValue;
+
+    // Push the result onto the expression array
+    expressionArray = [currentValue.toString()];
 });
